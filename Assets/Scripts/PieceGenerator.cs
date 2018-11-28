@@ -11,15 +11,18 @@ public class PieceGenerator : MonoBehaviour {
 		if (instance == null)
         {
             instance = this;
-            Spawn();
         }
         else
         {
             Destroy(gameObject);
         }
 	}
-	
-	public void Spawn () {
+    void Start()
+    {
+        Spawn();
+    }
+
+    public void Spawn () {
         GameObject randomPieceTemplate = Pieces[Random.Range(0, Pieces.Length - 1)].gameObject;
         GameObject newPiece = Instantiate(randomPieceTemplate, randomPieceTemplate.transform.position, randomPieceTemplate.transform.rotation);
         newPiece.SetActive(true);

@@ -1,26 +1,34 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Collision : MonoBehaviour {
     PieceHandler parentPiece;
 
-    int currentOverlaps = 0;
-    void Awake()
+    private int m_CurrentRow;
+    void Start()
     {
         parentPiece = transform.parent.GetComponent<PieceHandler>();
+        GameManager.instance.OnPiecePlaced += NewPlacement;
     }
-	void OnTriggerEnter2D()
+    public int GetCurrentRow()
     {
-        currentOverlaps++;
-        parentPiece.Collided();
+        return m_CurrentRow;
     }
-    void OnTriggerExit2D()
+    private void NewPlacement()
     {
-        currentOverlaps--;
     }
-    public int GetOverlapCount()
+
+    void OnTriggerEnter2D(Collider2D col)
     {
-        return currentOverlaps;
+        if (col.tag == "Walls")
+        {
+            parentPiece.Collided();
+        }
+        else if (col.GetComponent<Row>())
+        {
+            m_CurrentRow = col.GetComponent<Row>().GetRowIndex();
+        }
     }
 }

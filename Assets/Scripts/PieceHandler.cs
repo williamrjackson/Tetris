@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class PieceHandler : MonoBehaviour {
 
-    public Collision[] boxes;
+    public List<Collision> boxes = new List<Collision>();
+    public bool Uncontrollable;
 
     private bool isPlanted;
     void OnEnable () {
-        StartCoroutine(StepPerSec());
+        if (Uncontrollable)
+        {
+            StartCoroutine(AllTheWayDown());
+        }
+        else
+        {
+            StartCoroutine(StepPerSec());
+        }
 	}
 	
     public void Collided()
@@ -24,7 +32,7 @@ public class PieceHandler : MonoBehaviour {
     }
     void Update()
     {
-        if (!isPlanted)
+        if (!isPlanted && !Uncontrollable)
         {
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
@@ -101,8 +109,17 @@ public class PieceHandler : MonoBehaviour {
             if (hit && hit.transform.parent != transform)
             {
                 isPlanted = true;
-                RowChecker.instance.CheckRows();
-                PieceGenerator.instance.Spawn();
+                foreach(Collision orphanBlock in boxes)
+                {
+                    if (orphanBlock != null)
+                        orphanBlock.transform.parent = null;
+                }
+                GameManager.instance.ReportPiecePlaced();
+
+                if (!Uncontrollable)
+                    PieceGenerator.instance.Spawn();
+
+                Destroy(gameObject);
                 return false;
             }
         }
