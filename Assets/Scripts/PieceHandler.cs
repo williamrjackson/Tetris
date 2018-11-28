@@ -8,7 +8,9 @@ public class PieceHandler : MonoBehaviour {
     public bool Uncontrollable;
 
     private bool isPlanted;
-    void OnEnable () {
+    private bool hasMoved;
+    void OnEnable ()
+    {
         if (Uncontrollable)
         {
             StartCoroutine(AllTheWayDown());
@@ -104,6 +106,9 @@ public class PieceHandler : MonoBehaviour {
 	bool StepDown () {
         foreach (Collision box in boxes)
         {
+            if (box == null)
+                return false;
+
             RaycastHit2D hit;
             hit = Physics2D.Raycast(box.transform.position + Vector3.down * .26f, Vector3.down, .25f);
             if (hit && hit.transform.parent != transform)
@@ -115,7 +120,11 @@ public class PieceHandler : MonoBehaviour {
                         orphanBlock.transform.parent = null;
                 }
                 GameManager.instance.ReportPiecePlaced();
-
+                if (!hasMoved)
+                {
+                    GameManager.instance.GameOver = true;
+                    return false;
+                }
                 if (!Uncontrollable)
                     PieceGenerator.instance.Spawn();
 
@@ -124,6 +133,7 @@ public class PieceHandler : MonoBehaviour {
             }
         }
         transform.position += Vector3.down * .5f;
+        hasMoved = true;
         return true;
 	}
 }

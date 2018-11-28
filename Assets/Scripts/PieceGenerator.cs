@@ -23,6 +23,8 @@ public class PieceGenerator : MonoBehaviour {
     }
 
     public void Spawn () {
+        if (GameManager.instance.GameOver)
+            return;
         GameObject randomPieceTemplate = Pieces[Random.Range(0, Pieces.Length - 1)].gameObject;
         GameObject newPiece = Instantiate(randomPieceTemplate, randomPieceTemplate.transform.position, randomPieceTemplate.transform.rotation);
         newPiece.SetActive(true);

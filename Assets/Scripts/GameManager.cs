@@ -7,8 +7,60 @@ public class GameManager : MonoBehaviour {
     public static GameManager instance;
 
     public UnityAction OnPiecePlaced;
-	// Use this for initialization
-	void Awake () {
+    public UnityAction RestartGame;
+
+    private bool m_GameOver;
+    private bool m_Pause;
+    public bool GameOver
+    {
+        set
+        {
+            if (value == false && m_GameOver == true)
+            {
+                foreach(Collision c in FindObjectsOfType<Collision>())
+                {
+                    Destroy(c.gameObject);
+                }
+                foreach(PieceHandler ph in FindObjectsOfType<PieceHandler>())
+                {
+                    Destroy(ph.gameObject);
+                }
+                print("Restart");
+                if (RestartGame != null)
+                    RestartGame();
+                m_GameOver = false;
+                PieceGenerator.instance.Spawn();
+            }
+            m_GameOver = value;
+            if (m_GameOver) print("GameOver");
+        }
+        get
+        {
+            return m_GameOver;
+        }
+    }
+    public bool Pause
+    {
+        set
+        {
+            m_Pause = value;
+            if (m_Pause)
+            {
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
+        }
+        get
+        {
+            return m_Pause;
+        }
+    }
+
+    // Use this for initialization
+    void Awake () {
 		if (instance == null)
         {
             instance = this;
@@ -19,7 +71,7 @@ public class GameManager : MonoBehaviour {
         }
 	}
 
-    // Update is called once per frame
+    
     public void ReportPiecePlaced()
     {
         if (OnPiecePlaced != null)
@@ -42,7 +94,7 @@ public class GameManager : MonoBehaviour {
                     rowBlockCount++;
                 }
             }
-            print("Blocks in row " + i + ": " + rowBlockCount);
+            // print("Blocks in row " + i + ": " + rowBlockCount);
             if (rowBlockCount > 9)
             {
                 GameObject newCollection = new GameObject();
@@ -53,7 +105,6 @@ public class GameManager : MonoBehaviour {
                 {
                     if (block.GetCurrentRow() == i)
                     {
-                        print("Destroying");
                         Destroy(block.gameObject);
                     }
                     else if (block.GetCurrentRow() < i)
@@ -66,4 +117,15 @@ public class GameManager : MonoBehaviour {
             }
         }
 	}
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            GameOver = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Pause = true;
+        }
+    }
 }

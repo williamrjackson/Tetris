@@ -9,6 +9,8 @@ public class Collision : MonoBehaviour {
     private int m_CurrentRow;
     void Start()
     {
+        if (GameManager.instance.GameOver)
+            return;
         parentPiece = transform.parent.GetComponent<PieceHandler>();
         GameManager.instance.OnPiecePlaced += NewPlacement;
     }
